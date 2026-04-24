@@ -4,6 +4,8 @@ import { ROUTES } from '@/utils/constants';
 import { ProtectedRoute, PublicOnlyRoute } from './RouteGuards';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import AuthLayout from '@/components/layout/AuthLayout';
+import MainLayout from '@/components/layout/MainLayout';
 
 // ── Lazy-loaded Pages ──────────────────────────────────────────
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
@@ -44,18 +46,22 @@ function AppRoutes() {
 
         {/* Auth Routes — redirect if already logged in */}
         <Route element={<PublicOnlyRoute />}>
-          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-          <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+          <Route element={<AuthLayout />}>
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+          </Route>
         </Route>
 
         {/* Protected Routes — require authentication */}
         <Route element={<ProtectedRoute />}>
-          <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-          <Route path={ROUTES.LABS} element={<LabsPage />} />
-          <Route path={ROUTES.PROJECTS} element={<ProjectsPage />} />
-          <Route path={ROUTES.CHALLENGES} element={<ChallengesPage />} />
-          <Route path={ROUTES.MENTORS} element={<MentorsPage />} />
-          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+          <Route element={<MainLayout />}>
+            <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+            <Route path={ROUTES.LABS} element={<LabsPage />} />
+            <Route path={ROUTES.PROJECTS} element={<ProjectsPage />} />
+            <Route path={ROUTES.CHALLENGES} element={<ChallengesPage />} />
+            <Route path={ROUTES.MENTORS} element={<MentorsPage />} />
+            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+          </Route>
         </Route>
 
         {/* Fallback */}
