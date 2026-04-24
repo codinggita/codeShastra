@@ -33,25 +33,25 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gray-50 dark:bg-bg transition-colors duration-200">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
             Engineered for Excellence
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 dark:text-gray-400">
             The tools you need to move from 'writing code' to 'engineering systems'.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} padding="xl" variant="elevated" className="bg-white border-none shadow-sm hover:shadow-md transition-shadow h-full flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700 mb-6">
+            <Card key={index} padding="xl" variant="elevated" className="bg-white dark:bg-surface border-none shadow-sm hover:shadow-md transition-all h-full flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-300 mb-6 transition-colors">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-              <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
                 {feature.description}
               </p>
             </Card>

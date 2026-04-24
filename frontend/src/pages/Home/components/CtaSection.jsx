@@ -7,7 +7,7 @@ const CtaSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 bg-gray-50 pb-32">
+    <section className="py-20 bg-gray-50 dark:bg-bg pb-32 transition-colors duration-200">
       <div className="container mx-auto px-4 md:px-6">
         <div className="bg-gradient-to-r from-primary to-blue-600 rounded-[2.5rem] p-10 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden">
           
@@ -26,7 +26,7 @@ const CtaSection = () => {
               <Button 
                 size="lg" 
                 onClick={() => navigate(ROUTES.SIGNUP)} 
-                className="text-primary bg-white hover:bg-gray-50 border-white hover:border-gray-50 text-lg px-8 shadow-lg"
+                className="!text-primary !bg-white hover:!bg-gray-100 border-none text-lg px-8 shadow-lg"
               >
                 Get Started Now
               </Button>

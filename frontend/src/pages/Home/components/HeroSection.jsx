@@ -13,17 +13,17 @@ const HeroSection = () => {
           
           {/* Left Text Content */}
           <div className="max-w-2xl">
-            <div className="inline-flex items-center space-x-2 text-sm font-semibold text-primary mb-6 tracking-wider uppercase">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            <div className="inline-flex items-center space-x-2 text-sm font-semibold text-primary dark:text-primary-light mb-6 tracking-wider uppercase">
+              <span className="w-2 h-2 rounded-full bg-primary dark:bg-primary-light animate-pulse"></span>
               <span>The Future of Engineering Education</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
-              Learn by <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">Building</span>,<br />
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-[1.1] mb-6 transition-colors">
+              Learn by <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600 dark:from-primary-light dark:to-blue-400">Building</span>,<br />
               Not Just Studying
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl">
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed max-w-xl transition-colors">
               Escape the tutorial hell. Master high-level software engineering through an editorial learning experience designed for the next generation of architects.
             </p>
             
@@ -31,7 +31,7 @@ const HeroSection = () => {
               <Button size="lg" onClick={() => navigate(ROUTES.SIGNUP)} className="text-lg px-8 shadow-lg shadow-primary/30">
                 Get Started
               </Button>
-              <Button variant="ghost" size="lg" className="text-lg px-8 bg-blue-50 text-blue-700 hover:bg-blue-100">
+              <Button variant="ghost" size="lg" className="text-lg px-8 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors">
                 Try Demo
               </Button>
             </div>
