@@ -7,16 +7,15 @@ import Box from '@mui/material/Box';
 import AuthLayout from '@/components/layout/AuthLayout';
 import MainLayout from '@/components/layout/MainLayout';
 
-// ── Lazy-loaded Pages ──────────────────────────────────────────
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/Auth/SignupPage'));
-const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
-const LabsPage = lazy(() => import('@/pages/Labs/LabsPage'));
-const ProjectsPage = lazy(() => import('@/pages/Projects/ProjectsPage'));
-const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
-const MentorsPage = lazy(() => import('@/pages/Mentors/MentorsPage'));
-const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
+// const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
+// const LabsPage = lazy(() => import('@/pages/Labs/LabsPage'));
+// const ProjectsPage = lazy(() => import('@/pages/Projects/ProjectsPage'));
+// const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
+// const MentorsPage = lazy(() => import('@/pages/Mentors/MentorsPage'));
+// const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
 
 // ── Loading Fallback ───────────────────────────────────────────
 const PageLoader = () => (
@@ -55,12 +54,12 @@ function AppRoutes() {
         {/* Protected Routes — require authentication */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
-            <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-            <Route path={ROUTES.LABS} element={<LabsPage />} />
-            <Route path={ROUTES.PROJECTS} element={<ProjectsPage />} />
-            <Route path={ROUTES.CHALLENGES} element={<ChallengesPage />} />
-            <Route path={ROUTES.MENTORS} element={<MentorsPage />} />
-            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+            <Route path={ROUTES.DASHBOARD} element={<div>Dashboard (Coming Soon)</div>} />
+            <Route path={ROUTES.LABS} element={<div>Labs (Coming Soon)</div>} />
+            <Route path={ROUTES.PROJECTS} element={<div>Projects (Coming Soon)</div>} />
+            <Route path={ROUTES.CHALLENGES} element={<div>Challenges (Coming Soon)</div>} />
+            <Route path={ROUTES.MENTORS} element={<div>Mentors (Coming Soon)</div>} />
+            <Route path={ROUTES.PROFILE} element={<div>Profile (Coming Soon)</div>} />
           </Route>
         </Route>
 
