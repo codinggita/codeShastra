@@ -12,11 +12,17 @@ export default {
         },
         secondary: '#0ea5e9',
         accent: '#f59e0b',
+        bg: 'var(--color-bg)',
         surface: {
           DEFAULT: 'var(--color-surface)',
           alt: 'var(--color-surface-alt)',
         },
         border: 'var(--color-border)',
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          muted: 'var(--color-text-muted)',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
