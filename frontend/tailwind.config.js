@@ -1,0 +1,39 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: ['class', '[data-theme="dark"]'],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#4f46e5',
+          light: '#818cf8',
+          dark: '#3730a3',
+        },
+        secondary: '#0ea5e9',
+        accent: '#f59e0b',
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          alt: 'var(--color-surface-alt)',
+        },
+        border: 'var(--color-border)',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['Fira Code', 'Cascadia Code', 'monospace'],
+      },
+      borderRadius: {
+        sm: '0.25rem',
+        md: '0.5rem',
+        lg: '0.75rem',
+        xl: '1rem',
+      },
+      boxShadow: {
+        sm: '0 1px 2px rgba(0,0,0,0.05)',
+        md: '0 4px 6px -1px rgba(0,0,0,0.1)',
+        lg: '0 10px 15px -3px rgba(0,0,0,0.1)',
+      },
+    },
+  },
+  plugins: [],
+};
