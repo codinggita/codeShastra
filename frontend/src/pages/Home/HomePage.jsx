@@ -5,6 +5,7 @@ import GapSection from './components/GapSection';
 import MethodologySection from './components/MethodologySection';
 import FeaturesSection from './components/FeaturesSection';
 import CtaSection from './components/CtaSection';
+import Footer from './components/Footer';
 
 const HomePage = () => {
   return (
@@ -15,6 +16,7 @@ const HomePage = () => {
       <MethodologySection />
       <FeaturesSection />
       <CtaSection />
+      <Footer />
     </main>
   );
 };
