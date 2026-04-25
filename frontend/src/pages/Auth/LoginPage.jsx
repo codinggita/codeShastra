@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { loginSuccess } from '@/store/slices/authSlice';
-import { setToken, setUser } from '@/utils/storage';
+import authService from '@/services/authService';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -39,28 +39,23 @@ export const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      // ── LocalStorage-based mock auth ────────────────────────────
-      // In production: replace this block with authService.login(formData)
-      const storedUser = JSON.parse(localStorage.getItem('cs_mock_user') || 'null');
-
-      if (!storedUser || storedUser.email !== formData.email) {
-        throw new Error('No account found with this email. Please sign up first.');
-      }
-      if (storedUser.password !== formData.password) {
-        throw new Error('Incorrect password. Please try again.');
+      const data = await authService.login(formData);
+      
+      // Assume API returns { token, user } in response.data
+      const { user, token } = data;
+      
+      if (!token || !user) {
+        throw new Error('Invalid response from server.');
       }
 
-      // Build a mock JWT-like token
-      const mockToken = btoa(JSON.stringify({ id: storedUser.id, email: storedUser.email }));
-      const user = { id: storedUser.id, name: storedUser.name, email: storedUser.email, role: 'student' };
-
-      // Persist to localStorage and dispatch to Redux
-      setToken(mockToken);
-      setUser(user);
-      dispatch(loginSuccess({ user, token: mockToken }));
+      dispatch(loginSuccess({ user, token }));
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      setError(
+        err.response?.data?.message || 
+        err.message || 
+        'Login failed. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }

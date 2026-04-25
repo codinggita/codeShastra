@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { loginSuccess } from '@/store/slices/authSlice';
-import { setToken, setUser } from '@/utils/storage';
+import { authService } from '@/services/authService';
 
 export const SignupPage = () => {
   const navigate = useNavigate();
@@ -38,26 +38,23 @@ export const SignupPage = () => {
 
     setIsLoading(true);
     try {
-      // ── LocalStorage-based mock auth ────────────────────────────
-      // In production: replace this block with authService.register(formData)
-      const existing = JSON.parse(localStorage.getItem('cs_mock_user') || 'null');
-      if (existing && existing.email === formData.email) {
-        throw new Error('An account with this email already exists. Please log in.');
+      const data = await authService.register(formData);
+      
+      // Assume API returns { token, user } in response.data upon successful registration
+      const { user, token } = data;
+      
+      if (!token || !user) {
+        throw new Error('Invalid response from server.');
       }
 
-      // Save the mock user to localStorage
-      const newUser = { id: Date.now().toString(), name: formData.name, email: formData.email, password: formData.password };
-      localStorage.setItem('cs_mock_user', JSON.stringify(newUser));
-
-      // Build a mock token and dispatch to Redux
-      const mockToken = btoa(JSON.stringify({ id: newUser.id, email: newUser.email }));
-      const user = { id: newUser.id, name: newUser.name, email: newUser.email, role: 'student' };
-      setToken(mockToken);
-      setUser(user);
-      dispatch(loginSuccess({ user, token: mockToken }));
+      dispatch(loginSuccess({ user, token }));
       navigate(ROUTES.DASHBOARD, { replace: true });
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(
+        err.response?.data?.message || 
+        err.message || 
+        'Registration failed. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
