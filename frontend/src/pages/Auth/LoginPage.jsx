@@ -1,36 +1,79 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { FiGithub } from 'react-icons/fi';
+import { FiGithub, FiAlertCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { ROUTES } from '@/utils/constants';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import { loginSuccess } from '@/store/slices/authSlice';
+import authService from '@/services/authService';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
+
+  // Redirect back to the page the user tried to visit, or dashboard
+  const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
 
   const handleChange = (e) => {
     const { id, value } = e.target;
+    setError(''); // clear error on each keystroke
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
     setIsLoading(true);
-    // TODO: Connect to backend API via authService.login
-    setTimeout(() => {
+    try {
+      // ── LocalStorage-based robust mock auth ────────────────────────────
+      // In production: replace this block with authService.login(formData)
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const existingUsers = JSON.parse(localStorage.getItem('cs_mock_users') || '[]');
+      const storedUser = existingUsers.find(u => u.email === formData.email);
+
+      // Backwards compatibility with the single-user mock from earlier
+      const oldSingleUser = JSON.parse(localStorage.getItem('cs_mock_user') || 'null');
+      let targetUser = storedUser;
+      
+      if (!targetUser && oldSingleUser && oldSingleUser.email === formData.email) {
+        targetUser = oldSingleUser;
+      }
+
+      if (!targetUser) {
+        throw new Error('No account found with this email. Please sign up first.');
+      }
+      if (targetUser.password !== formData.password) {
+        throw new Error('Incorrect password. Please try again.');
+      }
+
+      // Build a mock JWT-like token
+      const mockToken = btoa(JSON.stringify({ id: targetUser.id, email: targetUser.email }));
+      const user = { id: targetUser.id, name: targetUser.name, email: targetUser.email, role: 'student' };
+
+      dispatch(loginSuccess({ user, token: mockToken }));
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      // Mock successful login
-      navigate(ROUTES.DASHBOARD);
-    }, 1500);
+    }
   };
 
   return (
@@ -61,6 +104,13 @@ export const LoginPage = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Error Banner */}
+        {error && (
+          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+            <FiAlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
         <Input
           id="email"
           type="email"
