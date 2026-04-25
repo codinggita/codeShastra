@@ -10,6 +10,7 @@ import MainLayout from '@/components/layout/MainLayout';
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/Auth/SignupPage'));
+const DebuggingLab = lazy(() => import('@/pages/Labs/DebuggingLab'));
 // const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
 // const LabsPage = lazy(() => import('@/pages/Labs/LabsPage'));
 // const ProjectsPage = lazy(() => import('@/pages/Projects/ProjectsPage'));
@@ -55,6 +56,7 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path={ROUTES.DASHBOARD} element={<div>Dashboard (Coming Soon)</div>} />
+            <Route path={ROUTES.DEBUGGING_LAB} element={<DebuggingLab />} />
             <Route path={ROUTES.LABS} element={<div>Labs (Coming Soon)</div>} />
             <Route path={ROUTES.PROJECTS} element={<div>Projects (Coming Soon)</div>} />
             <Route path={ROUTES.CHALLENGES} element={<div>Challenges (Coming Soon)</div>} />

@@ -22,34 +22,34 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="w-full bg-white dark:bg-surface border-b border-gray-200 dark:border-border z-50 h-16 shadow-sm transition-colors duration-200">
+    <nav className="w-full  dark:bg-surface border-b border-gray-200 dark:border-border z-50 h-16 shadow-sm transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="flex justify-between items-center h-full">
-          
+
           {/* Brand */}
           <Link to={ROUTES.HOME} className="flex items-center gap-2 group">
-             <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center transition-transform group-hover:scale-105">
+            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center transition-transform group-hover:scale-105">
               <span className="text-white font-bold text-lg leading-none">{'</>'}</span>
             </div>
             <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">CodeShastra</span>
           </Link>
 
-          {/* Center Links (Optional, matching image) */}
-          <div className="hidden md:flex space-x-8 text-sm font-medium text-gray-600 dark:text-gray-300">
-            <Link to={ROUTES.HOME} className="hover:text-primary transition-colors">Landing</Link>
-            <Link to="#" className="hover:text-primary transition-colors">Courses</Link>
-            <Link to="#" className="hover:text-primary transition-colors">Mentors</Link>
+          {/* Center Links */}
+          <div className="hidden md:flex space-x-8 text-sm font-semibold text-gray-700 dark:text-gray-200">
+            <Link to={ROUTES.DASHBOARD} className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all">Dashboard</Link>
+            <Link to={ROUTES.LABS} className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all">Courses</Link>
+            <Link to={ROUTES.DEBUGGING_LAB} className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all">Debugging Lab</Link>
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
-            
+
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">
                   Hi, {user?.name || 'Student'}
                 </span>
-                
+
                 <button
                   onClick={() => navigate(ROUTES.DASHBOARD)}
                   className="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"

@@ -22,6 +22,7 @@ export const ROUTES = {
   CHALLENGE_ROOM: '/challenges/:id/room',
   MENTORS: '/mentors',
   PROFILE: '/profile',
+  DEBUGGING_LAB: '/debugging-lab',
 };
 
 // ── User Roles ────────────────────────────────────────────────
