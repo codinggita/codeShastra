@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import uiReducer from './slices/uiSlice';
+import courseReducer from './slices/courseSlice';
 
 /**
  * CodeShastra Redux Store
@@ -11,6 +12,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     ui: uiReducer,
+    course: courseReducer,
   },
   devTools: import.meta.env.DEV,
   middleware: getDefaultMiddleware =>

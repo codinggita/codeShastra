@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiAlertCircle, FiInfo, FiActivity, FiCpu, FiPlay, FiSend, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
 const DebuggingLab = () => {
+  const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [activeTab, setActiveTab] = useState('Memory Profile');
 
@@ -12,6 +14,12 @@ const DebuggingLab = () => {
     <div className="flex h-[calc(100vh-4rem)] bg-[#f8f9fa] overflow-hidden">
       {/* Left Panel: Description */}
       <div className="w-1/3 p-8 overflow-y-auto border-r border-gray-200 bg-white">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="mb-6 flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+        >
+          <FiArrowLeft size={16} /> Go Back
+        </button>
         <div className="flex items-center gap-3 mb-6">
           <span className="px-2 py-1 text-xs font-bold text-orange-700 bg-orange-100 rounded">HARD</span>
           <span className="text-sm text-gray-500 font-medium">Challenge #42</span>

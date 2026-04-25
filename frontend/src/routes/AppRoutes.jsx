@@ -11,8 +11,8 @@ const HomePage = lazy(() => import('@/pages/Home/HomePage'));
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/Auth/SignupPage'));
 const DebuggingLab = lazy(() => import('@/pages/Labs/DebuggingLab'));
-// const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
-// const LabsPage = lazy(() => import('@/pages/Labs/LabsPage'));
+const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
+const CoursesPage = lazy(() => import('@/pages/Labs/CoursesPage'));
 // const ProjectsPage = lazy(() => import('@/pages/Projects/ProjectsPage'));
 // const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
 // const MentorsPage = lazy(() => import('@/pages/Mentors/MentorsPage'));
@@ -55,9 +55,9 @@ function AppRoutes() {
         {/* Protected Routes — require authentication */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
-            <Route path={ROUTES.DASHBOARD} element={<div>Dashboard (Coming Soon)</div>} />
+            <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
             <Route path={ROUTES.DEBUGGING_LAB} element={<DebuggingLab />} />
-            <Route path={ROUTES.LABS} element={<div>Labs (Coming Soon)</div>} />
+            <Route path={ROUTES.LABS} element={<CoursesPage />} />
             <Route path={ROUTES.PROJECTS} element={<div>Projects (Coming Soon)</div>} />
             <Route path={ROUTES.CHALLENGES} element={<div>Challenges (Coming Soon)</div>} />
             <Route path={ROUTES.MENTORS} element={<div>Mentors (Coming Soon)</div>} />
