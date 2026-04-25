@@ -39,23 +39,38 @@ export const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const data = await authService.login(formData);
+      // ── LocalStorage-based robust mock auth ────────────────────────────
+      // In production: replace this block with authService.login(formData)
       
-      // Assume API returns { token, user } in response.data
-      const { user, token } = data;
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const existingUsers = JSON.parse(localStorage.getItem('cs_mock_users') || '[]');
+      const storedUser = existingUsers.find(u => u.email === formData.email);
+
+      // Backwards compatibility with the single-user mock from earlier
+      const oldSingleUser = JSON.parse(localStorage.getItem('cs_mock_user') || 'null');
+      let targetUser = storedUser;
       
-      if (!token || !user) {
-        throw new Error('Invalid response from server.');
+      if (!targetUser && oldSingleUser && oldSingleUser.email === formData.email) {
+        targetUser = oldSingleUser;
       }
 
-      dispatch(loginSuccess({ user, token }));
+      if (!targetUser) {
+        throw new Error('No account found with this email. Please sign up first.');
+      }
+      if (targetUser.password !== formData.password) {
+        throw new Error('Incorrect password. Please try again.');
+      }
+
+      // Build a mock JWT-like token
+      const mockToken = btoa(JSON.stringify({ id: targetUser.id, email: targetUser.email }));
+      const user = { id: targetUser.id, name: targetUser.name, email: targetUser.email, role: 'student' };
+
+      dispatch(loginSuccess({ user, token: mockToken }));
       navigate(from, { replace: true });
     } catch (err) {
-      setError(
-        err.response?.data?.message || 
-        err.message || 
-        'Login failed. Please try again.'
-      );
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -38,23 +38,35 @@ export const SignupPage = () => {
 
     setIsLoading(true);
     try {
-      const data = await authService.register(formData);
+      // ── LocalStorage-based robust mock auth ────────────────────────────
+      // In production: replace this block with authService.register(formData)
       
-      // Assume API returns { token, user } in response.data upon successful registration
-      const { user, token } = data;
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const existingUsers = JSON.parse(localStorage.getItem('cs_mock_users') || '[]');
+      const oldSingleUser = JSON.parse(localStorage.getItem('cs_mock_user') || 'null');
       
-      if (!token || !user) {
-        throw new Error('Invalid response from server.');
+      const emailExistsInArray = existingUsers.some(u => u.email === formData.email);
+      const emailExistsInSingle = oldSingleUser && oldSingleUser.email === formData.email;
+
+      if (emailExistsInArray || emailExistsInSingle) {
+        throw new Error('An account with this email already exists. Please log in.');
       }
 
-      dispatch(loginSuccess({ user, token }));
+      // Save the mock user to localStorage array
+      const newUser = { id: Date.now().toString(), name: formData.name, email: formData.email, password: formData.password };
+      existingUsers.push(newUser);
+      localStorage.setItem('cs_mock_users', JSON.stringify(existingUsers));
+
+      // Build a mock token and dispatch to Redux
+      const mockToken = btoa(JSON.stringify({ id: newUser.id, email: newUser.email }));
+      const user = { id: newUser.id, name: newUser.name, email: newUser.email, role: 'student' };
+      
+      dispatch(loginSuccess({ user, token: mockToken }));
       navigate(ROUTES.DASHBOARD, { replace: true });
     } catch (err) {
-      setError(
-        err.response?.data?.message || 
-        err.message || 
-        'Registration failed. Please try again.'
-      );
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
