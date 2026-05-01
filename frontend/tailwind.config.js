@@ -39,6 +39,14 @@ export default {
         md: '0 4px 6px -1px rgba(0,0,0,0.1)',
         lg: '0 10px 15px -3px rgba(0,0,0,0.1)',
       },
+      keyframes: {
+        'fade-in': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        'slide-in-right': { from: { opacity: '0', transform: 'translateX(100%)' }, to: { opacity: '1', transform: 'translateX(0)' } },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.3s ease-out both',
+        'slide-in-right': 'slide-in-right 0.3s cubic-bezier(0.16,1,0.3,1) both',
+      },
     },
   },
   plugins: [],

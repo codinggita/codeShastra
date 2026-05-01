@@ -19,6 +19,7 @@ const ProjectDetail = lazy(() => import('@/pages/Projects/ProjectDetail'));
 // const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
 const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
 const ChallengeDetail = lazy(() => import('@/pages/Challenges/ChallengeDetail'));
+const LeaderboardPage = lazy(() => import('@/pages/Leaderboard/LeaderboardPage'));
 // const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
 
 // ── Loading Fallback ───────────────────────────────────────────
@@ -68,7 +69,7 @@ function AppRoutes() {
             <Route path={ROUTES.CHALLENGES} element={<ChallengesPage />} />
             <Route path="/challenges/:id" element={<ChallengeDetail />} />
             <Route path={ROUTES.MENTORS} element={<div>Mentors (Coming Soon)</div>} />
-            <Route path="/leaderboard" element={<div>Leaderboard (Coming Soon)</div>} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/profile" element={<div>Profile (Coming Soon)</div>} />
           </Route>
         </Route>
