@@ -20,7 +20,8 @@ const ProjectDetail = lazy(() => import('@/pages/Projects/ProjectDetail'));
 const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
 const ChallengeDetail = lazy(() => import('@/pages/Challenges/ChallengeDetail'));
 const LeaderboardPage = lazy(() => import('@/pages/Leaderboard/LeaderboardPage'));
-// const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
+const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
+const EditProfilePage = lazy(() => import('@/pages/Profile/EditProfilePage'));
 
 // ── Loading Fallback ───────────────────────────────────────────
 const PageLoader = () => (
@@ -70,7 +71,8 @@ function AppRoutes() {
             <Route path="/challenges/:id" element={<ChallengeDetail />} />
             <Route path={ROUTES.MENTORS} element={<div>Mentors (Coming Soon)</div>} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/profile" element={<div>Profile (Coming Soon)</div>} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/edit" element={<EditProfilePage />} />
           </Route>
         </Route>
 
