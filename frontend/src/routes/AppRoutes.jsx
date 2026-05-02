@@ -23,6 +23,8 @@ const LeaderboardPage = lazy(() => import('@/pages/Leaderboard/LeaderboardPage')
 const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
 const EditProfilePage = lazy(() => import('@/pages/Profile/EditProfilePage'));
 const SettingsPage = lazy(() => import('@/pages/Settings/SettingsPage'));
+const DeleteAccountPage = lazy(() => import('@/pages/Settings/DeleteAccountPage'));
+const SupportPage = lazy(() => import('@/pages/Support/SupportPage'));
 
 // ── Loading Fallback ───────────────────────────────────────────
 const PageLoader = () => (
@@ -75,6 +77,8 @@ function AppRoutes() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/edit" element={<EditProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/delete-account" element={<DeleteAccountPage />} />
+            <Route path="/support" element={<SupportPage />} />
           </Route>
         </Route>
 
