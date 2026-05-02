@@ -7,6 +7,7 @@ import {
   FiEye, FiMail, FiZap, FiCheckCircle, FiAlertCircle,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import authService from '@/services/authService';
 
 const SPECIALIZATIONS = ['Full Stack Engineering', 'Frontend Engineering', 'Backend Engineering', 'DevOps / Cloud', 'Machine Learning', 'System Design', 'Mobile Development'];
 const LANGUAGES       = ['TypeScript', 'JavaScript', 'Python', 'Go', 'Rust', 'Java', 'C++', 'Kotlin'];
@@ -104,23 +105,19 @@ export const EditProfilePage = () => {
   const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
   const togglePref = (key) => () => setPrefs(p => ({ ...p, [key]: !p[key] }));
 
-  const handleSave = () => {
-    // 1. Update Redux + cs_auth_user in localStorage
-    dispatch(updateUser({ name: form.name }));
-
-    // 2. Also update cs_mock_users so name persists after re-login
+  const handleSave = async () => {
     try {
-      const users = JSON.parse(localStorage.getItem('cs_mock_users') || '[]');
-      const updated = users.map(u =>
-        u.email === authUser?.email ? { ...u, name: form.name } : u
-      );
-      localStorage.setItem('cs_mock_users', JSON.stringify(updated));
-    } catch (e) {
-      console.warn('Could not update mock users:', e);
+      // 1. Save to backend
+      const updatedUser = await authService.updateProfile(form);
+      
+      // 2. Update Redux
+      dispatch(updateUser(updatedUser));
+      
+      toast.success('Profile settings saved!');
+      navigate('/profile');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update profile');
     }
-
-    toast.success('Profile settings saved!');
-    navigate('/profile');
   };
 
   const handleDiscard = () => {

@@ -7,6 +7,7 @@ import {
   FiUsers, FiArrowLeft, FiChevronRight,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import authService from '@/services/authService';
 
 // ── Consequence Card ───────────────────────────────────────────
 const ConsequenceCard = ({ icon: Icon, title, desc }) => (
@@ -29,7 +30,7 @@ export const DeleteAccountPage = () => {
   const [agreed, setAgreed]       = useState(false);
   const [confirming, setConfirming] = useState(false);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!agreed) {
       toast.error('Please check the confirmation box before deleting.');
       return;
@@ -37,27 +38,26 @@ export const DeleteAccountPage = () => {
 
     setConfirming(true);
 
-    // 1. Remove the user from cs_mock_users
     try {
-      const users = JSON.parse(localStorage.getItem('cs_mock_users') || '[]');
-      const updated = users.filter(u => u.email !== authUser?.email);
-      localStorage.setItem('cs_mock_users', JSON.stringify(updated));
-    } catch (e) {
-      console.warn('Could not purge mock users:', e);
+      // 1. Delete user from backend database
+      await authService.deleteAccount();
+
+      // 2. Wipe all auth keys locally
+      localStorage.removeItem('cs_auth_token');
+      localStorage.removeItem('cs_auth_user');
+      localStorage.removeItem('cs_theme');
+
+      // 3. Dispatch Redux logout
+      dispatch(logout());
+
+      toast.success('Account deleted. We\'re sorry to see you go.', { duration: 4000 });
+
+      // 4. Redirect to register page
+      setTimeout(() => navigate('/register'), 1200);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete account.');
+      setConfirming(false);
     }
-
-    // 2. Wipe all auth keys
-    localStorage.removeItem('cs_auth_token');
-    localStorage.removeItem('cs_auth_user');
-    localStorage.removeItem('cs_theme');
-
-    // 3. Dispatch Redux logout
-    dispatch(logout());
-
-    toast.success('Account deleted. We\'re sorry to see you go.', { duration: 4000 });
-
-    // 4. Redirect to register page
-    setTimeout(() => navigate('/register'), 1200);
   };
 
   return (
