@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { FiGrid, FiBookOpen, FiTerminal, FiFolder, FiTarget, FiBarChart2, FiUser, FiPlus, FiSettings, FiHelpCircle, FiArrowLeft } from 'react-icons/fi';
 import { ROUTES } from '@/utils/constants';
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
+
+  // Restore persisted theme on every app load
+  useEffect(() => {
+    const saved = localStorage.getItem('cs_theme') || 'light';
+    const root = document.documentElement;
+    if (saved === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+    } else if (saved === 'system') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) root.setAttribute('data-theme', 'dark');
+      else root.removeAttribute('data-theme');
+    } else {
+      root.removeAttribute('data-theme');
+    }
+  }, []);
 
   const navLinks = [
     { name: 'Dashboard', path: ROUTES.DASHBOARD, icon: <FiGrid size={18} /> },
@@ -57,10 +72,10 @@ const DashboardLayout = () => {
           </button>
           
           <div className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+            <button onClick={() => navigate('/settings')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
               <FiSettings size={18} /> Settings
             </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+            <button onClick={() => navigate('/support')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">
               <FiHelpCircle size={18} /> Support
             </button>
             <button onClick={() => navigate(ROUTES.HOME)} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors">

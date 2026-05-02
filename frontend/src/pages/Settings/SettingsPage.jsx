@@ -68,10 +68,27 @@ export const SettingsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [activeNav, setActiveNav]   = useState('account');
-  const [theme, setTheme]           = useState('system');
-  const [language, setLanguage]     = useState('English');
-  const [timezone, setTimezone]     = useState('Asia/Kolkata');
+  // Read saved theme from localStorage on mount
+  const [theme, setTheme] = useState(() => localStorage.getItem('cs_theme') || 'light');
+
+  const applyTheme = (mode) => {
+    const root = document.documentElement;
+    if (mode === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+    } else if (mode === 'system') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) root.setAttribute('data-theme', 'dark');
+      else root.removeAttribute('data-theme');
+    } else {
+      root.removeAttribute('data-theme');
+    }
+    localStorage.setItem('cs_theme', mode);
+    setTheme(mode);
+  };
+
+  const [activeNav, setActiveNav] = useState('account');
+  const [language, setLanguage]   = useState('English');
+  const [timezone, setTimezone]   = useState('Asia/Kolkata');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -224,9 +241,9 @@ export const SettingsPage = () => {
             <div className="mb-6">
               <p className="text-sm font-bold text-gray-700 mb-3">Theme</p>
               <div className="flex gap-3">
-                <ThemeBtn icon={FiSun}     label="Light"  active={theme === 'light'}  onClick={() => { setTheme('light');  toast('Light theme coming soon!');  }} />
-                <ThemeBtn icon={FiMoon}    label="Dark"   active={theme === 'dark'}   onClick={() => { setTheme('dark');   toast('Dark theme coming soon!');   }} />
-                <ThemeBtn icon={FiMonitor} label="System" active={theme === 'system'} onClick={() => { setTheme('system'); toast('Syncing with system theme.'); }} />
+                <ThemeBtn icon={FiSun}     label="Light"  active={theme === 'light'}  onClick={() => applyTheme('light')} />
+                <ThemeBtn icon={FiMoon}    label="Dark"   active={theme === 'dark'}   onClick={() => applyTheme('dark')} />
+                <ThemeBtn icon={FiMonitor} label="System" active={theme === 'system'} onClick={() => applyTheme('system')} />
               </div>
             </div>
 
@@ -306,7 +323,7 @@ export const SettingsPage = () => {
                   <p className="text-sm font-bold text-red-800">Delete Account</p>
                   <p className="text-xs text-red-500">Permanently remove your account and all associated data. Cannot be undone.</p>
                 </div>
-                <button onClick={() => toast.error('Account deletion requires backend integration.', { duration: 3000 })}
+                <button onClick={() => navigate('/settings/delete-account')}
                   className="flex items-center gap-1.5 text-xs font-bold bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors flex-shrink-0">
                   <FiTrash2 size={12} /> Delete
                 </button>
