@@ -6,22 +6,11 @@ import toast from 'react-hot-toast';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
 import { Helmet } from 'react-helmet-async';
+import { FaCode } from 'react-icons/fa';
+import useFetch from '@/hooks/useFetch';
 
 // Mock data based on Figma design
 const PROJECT_TABS = ['All Tech', 'Node.js', 'React', 'Python', 'Rust'];
-
-const PROJECTS = [
-  { id: 1, title: 'Build a Task Management API',    difficulty: 'SENIOR',    description: 'Architecture a high-performance RESTful API with complex relations, auth middleware, and rate limiting for enterprise-grade usage.', progress: 65, tech: 'Node.js', techIcon: <FaNodeJs className="text-green-600" />, actionText: 'View Project',  actionVariant: 'outline', avatars: ['https://i.pravatar.cc/150?u=1'], avatarExtra: '+4' },
-  { id: 2, title: 'E-commerce Checkout Flow',        difficulty: 'JUNIOR',    description: 'Design and implement a multi-step checkout experience using React with cart state, coupon codes, and Stripe-style payment UI.', progress: 12, tech: 'React',   techIcon: <FaReact className="text-blue-500" />,   actionText: 'View Project',  actionVariant: 'outline', avatars: ['https://i.pravatar.cc/150?u=2'] },
-  { id: 3, title: 'Real-time Data Dashboard',        difficulty: 'MID-LEVEL', description: 'Develop a socket-based dashboard that visualizes live crypto-market data with WebSocket feeds, charts, and alert thresholds.', progress: 0,  tech: 'Python',  techIcon: <FaPython className="text-yellow-500" />, actionText: 'Start Project', actionVariant: 'primary',  isNew: true },
-  { id: 4, title: 'CLI Portfolio Manager',           difficulty: 'MID-LEVEL', description: 'Build a robust command-line tool for managing investment portfolios with live price fetching, P&L reports, and export to CSV.', progress: 100,tech: 'Rust',    techIcon: <FaRust className="text-orange-600" />,   actionText: 'Review Docs',   actionVariant: 'outline' },
-  { id: 5, title: 'Microservices Orchestrator',      difficulty: 'SENIOR',    description: 'Configure a Kubernetes cluster and deploy a fleet of Node.js services with service discovery, load balancing, and health checks.', progress: 45, tech: 'DevOps',  techIcon: <FaCloud className="text-gray-500" />,    actionText: 'View Project',  actionVariant: 'outline' },
-  { id: 6, title: 'AI Code Review Assistant',        difficulty: 'SENIOR',    description: 'Integrate OpenAI APIs to build a GitHub bot that reviews PRs, suggests improvements, and enforces coding standards automatically.', progress: 20, tech: 'Python',  techIcon: <FaPython className="text-yellow-500" />, actionText: 'Start Project', actionVariant: 'primary',  isNew: true },
-  { id: 7, title: 'Authentication Microservice',     difficulty: 'MID-LEVEL', description: 'Build a standalone JWT-based auth service with refresh tokens, role-based access control, and secure session management.', progress: 80, tech: 'Node.js', techIcon: <FaNodeJs className="text-green-600" />, actionText: 'View Project',  actionVariant: 'outline', avatars: ['https://i.pravatar.cc/150?u=5'], avatarExtra: '+2' },
-  { id: 8, title: 'Component Design System',         difficulty: 'JUNIOR',    description: 'Build a reusable React component library from scratch — buttons, modals, tooltips — with Storybook docs and accessibility support.', progress: 55, tech: 'React',   techIcon: <FaReact className="text-blue-500" />,   actionText: 'View Project',  actionVariant: 'outline' },
-  { id: 9, title: 'Serverless Image Pipeline',       difficulty: 'MID-LEVEL', description: 'Design an AWS Lambda-powered pipeline that resizes, compresses, and CDN-delivers images on upload with zero server maintenance.', progress: 0,  tech: 'DevOps',  techIcon: <FaCloud className="text-gray-500" />,    actionText: 'Start Project', actionVariant: 'primary' },
-  { id: 10,title: 'GraphQL API Gateway',             difficulty: 'SENIOR',    description: 'Consolidate multiple REST services behind a single GraphQL gateway with schema stitching, query batching, and caching layers.', progress: 30, tech: 'Node.js', techIcon: <FaNodeJs className="text-green-600" />, actionText: 'View Project',  actionVariant: 'outline', avatars: ['https://i.pravatar.cc/150?u=8'], avatarExtra: '+1' },
-];
 
 const TOP_CONTRIBUTORS = [
   { name: 'Elena Soroka',  projects: 19, avatar: 'https://i.pravatar.cc/150?u=21', badge: '🥇' },
@@ -40,12 +29,16 @@ export const ProjectsPage = () => {
     navigate(`/projects/${id}`);
   };
 
-  const filteredProjects = PROJECTS.filter(project => {
-    const matchTech = activeTab === 'All Tech' || project.tech.toLowerCase().includes(activeTab.toLowerCase()) || project.tech === 'DevOps'; // including DevOps when filtering logic applies or simply match string. Actually simpler:
+  const { data: realProjects, isLoading, error } = useFetch('/projects');
+  
+  // Fallback to empty array if data isn't loaded yet
+  const projects = realProjects || [];
+
+  const filteredProjects = projects.filter(project => {
+    const matchTech = activeTab === 'All Tech' || project.tech.toLowerCase().includes(activeTab.toLowerCase()) || project.tech === 'DevOps';
     const matchTechTab = activeTab === 'All Tech' || project.tech.toLowerCase() === activeTab.toLowerCase() || (activeTab === 'Node.js' && project.tech === 'Node.js');
     const matchDiff = difficultyFilter === 'ALL' || project.difficulty === difficultyFilter;
     
-    // For DevOps (just checking 'All Tech' works for now, or you could map DevOps to All Tech)
     if(activeTab !== 'All Tech' && project.tech === 'DevOps') return false;
 
     return matchTechTab && matchDiff;
@@ -60,13 +53,16 @@ export const ProjectsPage = () => {
     }
   };
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  React.useEffect(() => {
-    // Simulate API fetch delay
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
+  const getTechIcon = (tech) => {
+    switch(tech) {
+      case 'Node.js': return <FaNodeJs className="text-green-600" />;
+      case 'React': return <FaReact className="text-blue-500" />;
+      case 'Python': return <FaPython className="text-yellow-500" />;
+      case 'Rust': return <FaRust className="text-orange-600" />;
+      case 'DevOps': return <FaCloud className="text-gray-500" />;
+      default: return <FaCode className="text-gray-500" />;
+    }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
@@ -181,9 +177,9 @@ export const ProjectsPage = () => {
         ) : (
           filteredProjects.map((project) => (
             <div 
-              key={project.id} 
+              key={project._id} 
               className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative flex flex-col h-full ${
-                project.isNew ? 'border-l-4 border-l-primary' : ''
+                project.isNewProject ? 'border-l-4 border-l-primary' : ''
               }`}
             >
               {/* Badges & Avatars */}
@@ -192,9 +188,9 @@ export const ProjectsPage = () => {
                   {project.difficulty}
                 </span>
                 
-                {project.isNew ? (
+                {project.isNewProject ? (
                   <FiStar className="text-primary fill-primary w-5 h-5" />
-                ) : project.avatars ? (
+                ) : project.avatars?.length > 0 ? (
                   <div className="flex -space-x-2">
                     {project.avatars.map((url, idx) => (
                       <img key={idx} src={url} alt="Avatar" className="w-6 h-6 rounded-full border-2 border-white" />
@@ -229,13 +225,13 @@ export const ProjectsPage = () => {
               {/* Footer Action */}
               <div className="flex justify-between items-center mt-auto">
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-600">
-                  {project.techIcon}
+                  {getTechIcon(project.tech)}
                   {project.tech}
                 </div>
                 <Button 
                   variant={project.actionVariant} 
                   size="sm" 
-                  onClick={() => handleActionClick(project.id)}
+                  onClick={() => handleActionClick(project._id)}
                   className={project.actionVariant === 'outline' ? 'bg-blue-50/50 border-blue-100 text-primary hover:bg-blue-50' : ''}
                 >
                   {project.actionText}
