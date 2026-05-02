@@ -114,6 +114,13 @@ export const ProfilePage = () => {
     navigate('/');
   };
 
+  // Live XP & level computations
+  const userXp = authUser?.xp || 0;
+  const currentLevel = Math.floor(userXp / 1000) + 1;
+  const xpInLevel = userXp % 1000;
+  const xpProgressPct = Math.round((xpInLevel / 1000) * 100);
+  const xpToNextLevel = 1000 - xpInLevel;
+
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
 
@@ -317,12 +324,12 @@ export const ProfilePage = () => {
               <FiAward className="text-indigo-500" size={18} />
               <h3 className="text-sm font-bold text-gray-900">Season XP</h3>
             </div>
-            <p className="text-3xl font-extrabold text-indigo-700 mb-1">4,285</p>
-            <p className="text-xs text-gray-500 mb-3">of 15,000 XP to Level 43</p>
+            <p className="text-3xl font-extrabold text-indigo-700 mb-1">{userXp.toLocaleString()}</p>
+            <p className="text-xs text-gray-500 mb-3">of {((currentLevel) * 1000).toLocaleString()} XP to Level {currentLevel + 1}</p>
             <div className="w-full bg-white rounded-full h-2 border border-indigo-100">
-              <div className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500" style={{ width: '28%' }} />
+              <div className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500" style={{ width: xpProgressPct + '%' }} />
             </div>
-            <p className="text-xs text-indigo-400 font-semibold mt-2">Top 15% this season · Rank #42</p>
+            <p className="text-xs text-indigo-400 font-semibold mt-2">{xpToNextLevel.toLocaleString()} XP to Level {currentLevel + 1} · Level {currentLevel}</p>
           </div>
 
           {/* Logout */}

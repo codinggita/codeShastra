@@ -2,28 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FiZap, FiFilter, FiPlay, FiAward, FiClock,
-  FiCheckCircle, FiTrendingUp, FiUsers, FiStar, FiLock,
+  FiCheckCircle, FiTrendingUp, FiUsers, FiStar, FiLock, FiAlertCircle
 } from 'react-icons/fi';
 import { FaCode, FaDatabase, FaReact, FaServer, FaCogs, FaNodeJs, FaPython } from 'react-icons/fa';
+import useFetch from '@/hooks/useFetch';
+import Skeleton from '@/components/ui/Skeleton';
 
 // ── Constants ──────────────────────────────────────────────────
 const TRACKS = ['All Tracks', 'Algorithms', 'Data Structures', 'System Design', 'Frontend Core'];
 const DIFFICULTIES = ['All', 'Easy', 'Medium', 'Hard'];
-
-const CHALLENGES = [
-  { id: 1, title: 'LRU Cache Implementation', description: 'Design and implement a data structure for Least Recently Used cache with O(1) time complexity for all operations.', difficulty: 'MEDIUM', track: 'Data Structures', xp: 450, completion: 64, icon: <FaCogs className="text-yellow-600" size={22} />, iconBg: 'bg-yellow-100' },
-  { id: 2, title: 'Valid Palindrome II', description: 'Given a string, determine if it can be a palindrome by deleting at most one character from it.', difficulty: 'EASY', track: 'Algorithms', xp: 200, completion: 82, icon: <FaCode className="text-green-600" size={22} />, iconBg: 'bg-green-100' },
-  { id: 3, title: 'Distributed Log Sorter', description: 'Efficiently sort millions of log entries across a distributed network with minimal latency and memory usage.', difficulty: 'HARD', track: 'System Design', xp: 1200, completion: 12, icon: <FaDatabase className="text-red-500" size={22} />, iconBg: 'bg-red-100' },
-  { id: 4, title: 'Async Request Scheduler', description: 'Build a throttle mechanism that limits the number of concurrent API requests with a queue-based waiting list.', difficulty: 'MEDIUM', track: 'Algorithms', xp: 550, completion: 41, icon: <FaServer className="text-blue-600" size={22} />, iconBg: 'bg-blue-100' },
-  { id: 5, title: 'Bento Layout Generator', description: 'Create an algorithm that arranges dynamic cards into an optimal bento-grid layout minimizing empty space.', difficulty: 'MEDIUM', track: 'Frontend Core', xp: 600, completion: 35, icon: <FaReact className="text-indigo-600" size={22} />, iconBg: 'bg-indigo-100' },
-  { id: 6, title: 'JWT Validation Engine', description: 'Implement a secure token validation library that handles rotation and expiration with RS256 and HS256.', difficulty: 'HARD', track: 'System Design', xp: 950, completion: 18, icon: <FaCogs className="text-rose-600" size={22} />, iconBg: 'bg-rose-100' },
-  { id: 7, title: 'Fibonacci Memoization', description: 'Implement the Fibonacci sequence with top-down memoization and analyze space-time trade-offs.', difficulty: 'EASY', track: 'Algorithms', xp: 150, completion: 91, icon: <FaCode className="text-teal-600" size={22} />, iconBg: 'bg-teal-100' },
-  { id: 8, title: 'GraphQL Rate Limiter', description: 'Design a per-query rate limiting system for a GraphQL API that handles burst traffic with token bucket algorithm.', difficulty: 'HARD', track: 'System Design', xp: 1100, completion: 8, icon: <FaNodeJs className="text-green-700" size={22} />, iconBg: 'bg-green-50' },
-  { id: 9, title: 'React Virtual Scroller', description: 'Build a high-performance virtual list that renders only visible rows, supporting dynamic item heights.', difficulty: 'MEDIUM', track: 'Frontend Core', xp: 700, completion: 29, icon: <FaReact className="text-sky-500" size={22} />, iconBg: 'bg-sky-100' },
-  { id: 10, title: 'Binary Search Variants', description: 'Solve 5 progressively harder binary search problems — from classic to rotated arrays to 2D matrix search.', difficulty: 'EASY', track: 'Algorithms', xp: 300, completion: 74, icon: <FaCode className="text-purple-600" size={22} />, iconBg: 'bg-purple-100' },
-  { id: 11, title: 'Kafka Consumer Group', description: 'Model and implement a Kafka-inspired consumer group system with offset management and partition rebalancing.', difficulty: 'HARD', track: 'System Design', xp: 1400, completion: 5, icon: <FaDatabase className="text-orange-600" size={22} />, iconBg: 'bg-orange-100' },
-  { id: 12, title: 'CSS-in-JS Theme Engine', description: 'Build a lightweight theme engine that generates CSS variables dynamically from a JavaScript token object.', difficulty: 'MEDIUM', track: 'Frontend Core', xp: 500, completion: 47, icon: <FaPython className="text-yellow-500" size={22} />, iconBg: 'bg-yellow-50' },
-];
 
 const SPOTLIGHT = {
   id: 99,
@@ -49,7 +36,7 @@ const RECENT_ACTIVITY = [
   { title: 'Binary Search Variants', result: 'Passed', xpGained: 300, time: '2d ago', difficulty: 'EASY' },
 ];
 
-// ── Helper ─────────────────────────────────────────────────────
+// ── Helpers ─────────────────────────────────────────────────────
 const difficultyStyle = (diff) => {
   switch (diff) {
     case 'EASY':   return 'bg-green-100 text-green-700';
@@ -59,13 +46,36 @@ const difficultyStyle = (diff) => {
   }
 };
 
+const getIconTextColor = (bgClass) => {
+  if (!bgClass) return 'text-gray-600';
+  return bgClass.replace('bg-', 'text-').replace('-100', '-600').replace('-50', '-700');
+};
+
+const IconResolver = ({ type, className, size }) => {
+  const icons = {
+    FaCode: <FaCode className={className} size={size} />,
+    FaDatabase: <FaDatabase className={className} size={size} />,
+    FaReact: <FaReact className={className} size={size} />,
+    FaServer: <FaServer className={className} size={size} />,
+    FaCogs: <FaCogs className={className} size={size} />,
+    FaNodeJs: <FaNodeJs className={className} size={size} />,
+    FaPython: <FaPython className={className} size={size} />
+  };
+  return icons[type] || <FaCode className={className} size={size} />;
+};
+
 // ── Component ──────────────────────────────────────────────────
 export const ChallengesPage = () => {
   const navigate = useNavigate();
   const [activeTrack, setActiveTrack] = useState('All Tracks');
   const [diffFilter, setDiffFilter] = useState('All');
 
-  const filtered = CHALLENGES.filter((c) => {
+  // Fetch from backend
+  const { data: challenges, isLoading, error } = useFetch('/challenges');
+
+  const challengesList = Array.isArray(challenges) ? challenges : [];
+
+  const filtered = challengesList.filter((c) => {
     const matchTrack = activeTrack === 'All Tracks' || c.track === activeTrack;
     const matchDiff  = diffFilter === 'All' || c.difficulty === diffFilter.toUpperCase();
     return matchTrack && matchDiff;
@@ -85,7 +95,7 @@ export const ChallengesPage = () => {
       {/* ── Stats Bar ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
         {[
-          { label: 'Total Challenges', value: '120+', icon: <FiZap className="text-yellow-500" />, bg: 'bg-yellow-50' },
+          { label: 'Total Challenges', value: isLoading ? '-' : challengesList.length.toString(), icon: <FiZap className="text-yellow-500" />, bg: 'bg-yellow-50' },
           { label: 'Completed', value: '38', icon: <FiCheckCircle className="text-green-500" />, bg: 'bg-green-50' },
           { label: 'Current Streak', value: '14 Days', icon: <FiTrendingUp className="text-primary" />, bg: 'bg-indigo-50' },
           { label: 'Total XP Earned', value: '12,450', icon: <FiAward className="text-purple-500" />, bg: 'bg-purple-50' },
@@ -154,6 +164,15 @@ export const ChallengesPage = () => {
         </div>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 text-center text-red-600 flex flex-col items-center">
+          <FiAlertCircle size={32} className="mb-2 opacity-80" />
+          <h2 className="text-lg font-bold">Failed to load challenges</h2>
+          <p className="text-sm opacity-80">{error}</p>
+        </div>
+      )}
+
       {/* ── Tracks + Difficulty Filter ────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-center border-b border-gray-200 mb-8 pb-4">
         <div className="flex gap-6 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -176,7 +195,25 @@ export const ChallengesPage = () => {
       </div>
 
       {/* ── Challenge Cards Grid ──────────────────────────────── */}
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col h-[220px]">
+              <div className="flex justify-between items-start mb-4">
+                <Skeleton className="w-10 h-10 rounded-xl" />
+                <Skeleton className="w-16 h-6 rounded" />
+              </div>
+              <Skeleton className="w-3/4 h-5 mb-3" />
+              <Skeleton className="w-full h-4 mb-2" />
+              <Skeleton className="w-2/3 h-4 mb-auto" />
+              <div className="flex items-center justify-between mt-6">
+                <Skeleton className="w-20 h-4" />
+                <Skeleton className="w-16 h-5 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <FiZap size={40} className="mx-auto mb-4 opacity-30" />
           <p className="font-semibold text-lg">No challenges match your filter.</p>
@@ -185,12 +222,14 @@ export const ChallengesPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
           {filtered.map((challenge) => (
             <div
-              key={challenge.id}
-              onClick={() => goToChallenge(challenge.id)}
+              key={challenge._id}
+              onClick={() => goToChallenge(challenge._id)}
               className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${challenge.iconBg}`}>{challenge.icon}</div>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${challenge.iconBg}`}>
+                  <IconResolver type={challenge.iconType} className={getIconTextColor(challenge.iconBg)} size={22} />
+                </div>
                 <span className={`text-[10px] font-bold px-2 py-1 rounded tracking-wider ${difficultyStyle(challenge.difficulty)}`}>{challenge.difficulty}</span>
               </div>
               <h3 className="text-base font-bold text-gray-900 mb-2 leading-snug">{challenge.title}</h3>

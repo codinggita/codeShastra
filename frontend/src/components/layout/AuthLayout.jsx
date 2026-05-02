@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { FiCheckCircle } from 'react-icons/fi';
+import { FiCheckCircle, FiArrowLeft } from 'react-icons/fi';
 import { ROUTES } from '@/utils/constants';
 
 /**
@@ -55,8 +55,11 @@ export const AuthLayout = () => {
       </div>
 
       {/* ── Right Panel: Dynamic Form Area ── */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className="w-full max-w-md">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12 relative">
+        <Link to={ROUTES.HOME} className="absolute top-6 right-6 sm:top-8 sm:right-8 flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+          <FiArrowLeft size={16} /> Back to Home
+        </Link>
+        <div className="w-full max-w-md mt-8 md:mt-0">
           {/* Mobile-only logo */}
           <div className="md:hidden flex justify-center mb-8">
             <Link to={ROUTES.HOME} className="flex items-center gap-2">

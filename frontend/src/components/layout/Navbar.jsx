@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiLogOut, FiUser } from 'react-icons/fi';
+import { FiLogOut, FiUser, FiChevronDown } from 'react-icons/fi';
 import { ROUTES } from '@/utils/constants';
 import { selectIsAuthenticated, selectUser } from '@/store/slices/authSlice';
 import { clearAuthData } from '@/utils/storage';
@@ -35,8 +35,25 @@ export const Navbar = () => {
           </Link>
 
           {/* Center Links */}
-          <div className="hidden md:flex space-x-8 text-sm font-semibold text-gray-700 dark:text-gray-200">
-            <Link to={ROUTES.DASHBOARD} className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all">Dashboard</Link>
+          <div className="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 dark:text-gray-200 h-full">
+            
+            {/* Hover Dropdown */}
+            <div className="relative group h-full flex items-center">
+              <button className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all flex items-center gap-1 cursor-pointer">
+                Workspace <FiChevronDown />
+              </button>
+              
+              {/* Dropdown Menu */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-48 bg-white border border-gray-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                <div className="py-2">
+                  <Link to={ROUTES.DASHBOARD} className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-primary font-medium transition-colors">Dashboard</Link>
+                  <Link to={ROUTES.PROJECTS} className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-primary font-medium transition-colors">Projects</Link>
+                  <Link to={ROUTES.CHALLENGES} className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-primary font-medium transition-colors">Challenges</Link>
+                  <Link to="/leaderboard" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-primary font-medium transition-colors">Leaderboard</Link>
+                </div>
+              </div>
+            </div>
+
             <Link to={ROUTES.LABS} className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all">Courses</Link>
             <Link to={ROUTES.DEBUGGING_LAB} className="hover:text-primary hover:underline underline-offset-4 decoration-2 transition-all">Debugging Lab</Link>
           </div>

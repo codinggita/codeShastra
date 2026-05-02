@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { getProjects, createProject } = require('../controllers/projectController');
-const { protect } = require('../middlewares/authMiddleware');
+const { getProjects, createProject, getProjectById } = require('../controllers/projectController');
+const { protect, admin } = require('../middlewares/authMiddleware');
 
-// Get all projects (protected route, requires user to be logged in)
-router.get('/', protect, getProjects);
+// Get all projects (public route so catalog is visible without login)
+router.get('/', getProjects);
 
-// Create a new project (for seeding or admins)
-router.post('/', createProject);
+// Get single project by ID
+router.get('/:id', getProjectById);
+
+// Create a new project (restricted to admins)
+router.post('/', protect, admin, createProject);
 
 module.exports = router;

@@ -93,6 +93,30 @@ export const SettingsPage = () => {
   const [activeNav, setActiveNav] = useState('account');
   const [language, setLanguage]   = useState('English');
   const [timezone, setTimezone]   = useState('Asia/Kolkata');
+
+  const [notifications, setNotifications] = useState({
+    challengeReminders: true,
+    weeklyDigest: false,
+    mentorMessages: true,
+    projectUpdates: true,
+    leaderboardAlerts: false,
+    emailSummary: true,
+  });
+
+  const [privacy, setPrivacy] = useState({
+    publicProfile: true,
+    showOnLeaderboard: true,
+    showActivity: true,
+    showXP: true,
+  });
+
+  const toggleNotif = (key) => () => {
+    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const togglePrivacy = (key) => () => {
+    setPrivacy(prev => ({ ...prev, [key]: !prev[key] }));
+  };
   const passwordForm = useFormik({
     initialValues: {
       currentPassword: '',

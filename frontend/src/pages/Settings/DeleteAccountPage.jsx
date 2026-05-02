@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '@/store/slices/authSlice';
+import { clearAuthData } from '@/utils/storage';
 import {
   FiAlertTriangle, FiAward, FiBox, FiCheckSquare,
   FiUsers, FiArrowLeft, FiChevronRight,
@@ -43,8 +44,7 @@ export const DeleteAccountPage = () => {
       await authService.deleteAccount();
 
       // 2. Wipe all auth keys locally
-      localStorage.removeItem('cs_auth_token');
-      localStorage.removeItem('cs_auth_user');
+      clearAuthData();
       localStorage.removeItem('cs_theme');
 
       // 3. Dispatch Redux logout

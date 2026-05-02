@@ -16,9 +16,11 @@ const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage'));
 const CoursesPage = lazy(() => import('@/pages/Labs/CoursesPage'));
 const ProjectsPage = lazy(() => import('@/pages/Projects/ProjectsPage'));
 const ProjectDetail = lazy(() => import('@/pages/Projects/ProjectDetail'));
+const ProjectWorkspace = lazy(() => import('@/pages/Projects/ProjectWorkspace'));
 // const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
 const ChallengesPage = lazy(() => import('@/pages/Challenges/ChallengesPage'));
 const ChallengeDetail = lazy(() => import('@/pages/Challenges/ChallengeDetail'));
+const CodingRoom = lazy(() => import('@/pages/Challenges/CodingRoom'));
 const LeaderboardPage = lazy(() => import('@/pages/Leaderboard/LeaderboardPage'));
 const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
 const EditProfilePage = lazy(() => import('@/pages/Profile/EditProfilePage'));
@@ -70,8 +72,10 @@ function AppRoutes() {
             <Route path={ROUTES.LABS} element={<CoursesPage />} />
             <Route path={ROUTES.PROJECTS} element={<ProjectsPage />} />
             <Route path={`${ROUTES.PROJECTS}/:id`} element={<ProjectDetail />} />
+            <Route path={`${ROUTES.PROJECTS}/:id/workspace`} element={<ProjectWorkspace />} />
             <Route path={ROUTES.CHALLENGES} element={<ChallengesPage />} />
             <Route path="/challenges/:id" element={<ChallengeDetail />} />
+            <Route path="/challenges/:id/room" element={<CodingRoom />} />
             <Route path={ROUTES.MENTORS} element={<div>Mentors (Coming Soon)</div>} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/profile" element={<ProfilePage />} />

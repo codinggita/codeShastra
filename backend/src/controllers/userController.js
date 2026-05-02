@@ -64,7 +64,23 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
+// @desc    Get top users by XP
+// @route   GET /api/users/leaderboard
+// @access  Public
+const getLeaderboard = async (req, res, next) => {
+  try {
+    const topUsers = await User.find({})
+      .sort({ xp: -1 })
+      .limit(5)
+      .select('name avatar level xp specialization');
+    res.json(topUsers);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   updateProfile,
   deleteAccount,
+  getLeaderboard,
 };

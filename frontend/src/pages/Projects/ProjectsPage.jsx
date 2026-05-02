@@ -31,12 +31,15 @@ export const ProjectsPage = () => {
 
   const { data: realProjects, isLoading, error } = useFetch('/projects');
   
-  // Fallback to empty array if data isn't loaded yet
-  const projects = realProjects || [];
+  // Fallback to empty array if data isn't loaded yet or if it returns an error object
+  const projects = Array.isArray(realProjects) ? realProjects : [];
 
   const filteredProjects = projects.filter(project => {
-    const matchTech = activeTab === 'All Tech' || project.tech.toLowerCase().includes(activeTab.toLowerCase()) || project.tech === 'DevOps';
-    const matchTechTab = activeTab === 'All Tech' || project.tech.toLowerCase() === activeTab.toLowerCase() || (activeTab === 'Node.js' && project.tech === 'Node.js');
+    const techStr = (project.tech || '').toLowerCase();
+    const activeTabLower = activeTab.toLowerCase();
+
+    const matchTech = activeTab === 'All Tech' || techStr.includes(activeTabLower) || project.tech === 'DevOps';
+    const matchTechTab = activeTab === 'All Tech' || techStr === activeTabLower || (activeTab === 'Node.js' && project.tech === 'Node.js');
     const matchDiff = difficultyFilter === 'ALL' || project.difficulty === difficultyFilter;
     
     if(activeTab !== 'All Tech' && project.tech === 'DevOps') return false;

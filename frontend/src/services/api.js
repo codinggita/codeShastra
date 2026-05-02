@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getToken, clearAuthData } from '@/utils/storage';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -12,7 +13,7 @@ const api = axios.create({
 // Request interceptor to add the JWT token to headers
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('cs_auth_token');
+    const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,8 +35,7 @@ api.interceptors.response.use(
       // store.dispatch(logout());
       
       // Clear token
-      localStorage.removeItem('cs_auth_token');
-      localStorage.removeItem('cs_auth_user');
+      clearAuthData();
       
       // Redirect to login if not already there
       if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
