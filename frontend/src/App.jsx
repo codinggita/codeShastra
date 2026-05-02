@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import AppRoutes from '@/routes/AppRoutes';
 import { createMuiTheme } from '@/theme/muiTheme';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 
 /**
  * Root Application Component
@@ -25,7 +26,9 @@ function App() {
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />
       <Toaster position="top-right" />
-      <AppRoutes />
+      <ErrorBoundary>
+        <AppRoutes />
+      </ErrorBoundary>
     </MuiThemeProvider>
   );
 }

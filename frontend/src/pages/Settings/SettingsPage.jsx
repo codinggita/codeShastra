@@ -8,6 +8,9 @@ import {
   FiLogOut, FiLock, FiMail, FiGlobe, FiSliders,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import authService from '@/services/authService';
 
 // ── Toggle ─────────────────────────────────────────────────────
@@ -90,42 +93,34 @@ export const SettingsPage = () => {
   const [activeNav, setActiveNav] = useState('account');
   const [language, setLanguage]   = useState('English');
   const [timezone, setTimezone]   = useState('Asia/Kolkata');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword]         = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const [notifications, setNotifications] = useState({
-    challengeReminders: true,
-    weeklyDigest:       false,
-    mentorMessages:     true,
-    projectUpdates:     true,
-    leaderboardAlerts:  false,
-    emailSummary:       true,
+  const passwordForm = useFormik({
+    initialValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+    validationSchema: Yup.object({
+      currentPassword: Yup.string().required('Current password is required'),
+      newPassword: Yup.string().min(8, 'New password must be at least 8 characters').required('New password is required'),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+        .required('Confirm password is required'),
+    }),
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      try {
+        await authService.changePassword({
+          currentPassword: values.currentPassword,
+          newPassword: values.newPassword,
+        });
+        resetForm();
+        toast.success('Password updated successfully!');
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update password');
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
-
-  const [privacy, setPrivacy] = useState({
-    showOnLeaderboard: true,
-    publicProfile:     true,
-    showActivity:      true,
-    showXP:            true,
-  });
-
-  const toggleNotif  = key => () => setNotifications(n => ({ ...n, [key]: !n[key] }));
-  const togglePrivacy = key => () => setPrivacy(p => ({ ...p, [key]: !p[key] }));
-
-  const handlePasswordSave = async () => {
-    if (!currentPassword) return toast.error('Enter your current password.');
-    if (newPassword.length < 8) return toast.error('New password must be at least 8 characters.');
-    if (newPassword !== confirmPassword) return toast.error('Passwords do not match.');
-    
-    try {
-      await authService.changePassword({ currentPassword, newPassword });
-      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
-      toast.success('Password updated successfully!');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update password');
-    }
-  };
 
   const scrollTo = (id) => {
     setActiveNav(id);
@@ -138,6 +133,10 @@ export const SettingsPage = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+      <Helmet>
+        <title>Settings | CodeShastra</title>
+        <meta name="description" content="Manage your account preferences, security, and privacy." />
+      </Helmet>
 
       {/* Header */}
       <div className="mb-8">
@@ -199,23 +198,38 @@ export const SettingsPage = () => {
             {/* Change Password */}
             <div>
               <p className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2"><FiLock size={14} /> Change Password</p>
-              <div className="space-y-3">
+              <form onSubmit={passwordForm.handleSubmit} className="space-y-3">
                 {[
-                  { label: 'Current Password', val: currentPassword, setter: setCurrentPassword },
-                  { label: 'New Password',      val: newPassword,    setter: setNewPassword    },
-                  { label: 'Confirm Password',  val: confirmPassword,setter: setConfirmPassword },
-                ].map(({ label, val, setter }) => (
-                  <div key={label}>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{label}</label>
-                    <input type="password" value={val} onChange={e => setter(e.target.value)} placeholder="••••••••"
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-colors" />
+                  { id: 'currentPassword', label: 'Current Password' },
+                  { id: 'newPassword',     label: 'New Password' },
+                  { id: 'confirmPassword', label: 'Confirm Password' },
+                ].map(({ id, label }) => (
+                  <div key={id}>
+                    <label htmlFor={id} className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{label}</label>
+                    <input
+                      id={id}
+                      type="password"
+                      placeholder="••••••••"
+                      className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 transition-colors ${
+                        passwordForm.touched[id] && passwordForm.errors[id]
+                          ? 'border-red-300 focus:border-red-400 focus:ring-red-100 bg-red-50'
+                          : 'border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 bg-white'
+                      }`}
+                      {...passwordForm.getFieldProps(id)}
+                    />
+                    {passwordForm.touched[id] && passwordForm.errors[id] && (
+                      <p className="text-xs text-red-500 mt-1">{passwordForm.errors[id]}</p>
+                    )}
                   </div>
                 ))}
-                <button onClick={handlePasswordSave}
-                  className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors shadow-sm">
-                  Update Password
+                <button
+                  type="submit"
+                  disabled={passwordForm.isSubmitting}
+                  className="mt-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+                >
+                  {passwordForm.isSubmitting ? 'Updating...' : 'Update Password'}
                 </button>
-              </div>
+              </form>
             </div>
 
             {/* Connected accounts */}

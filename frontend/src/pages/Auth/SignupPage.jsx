@@ -6,6 +6,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 
 import { ROUTES } from '@/utils/constants';
 import Button from '@/components/ui/Button';
@@ -52,6 +53,11 @@ export const SignupPage = () => {
 
   return (
     <Card variant="flat" padding="none" className="bg-transparent w-full">
+      <Helmet>
+        <title>Sign Up | CodeShastra</title>
+        <meta name="description" content="Create an account and start your coding journey." />
+      </Helmet>
+
       <div className="text-center mb-8">
         <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Create an account</h2>
         <p className="text-sm text-gray-600">

@@ -7,6 +7,9 @@ import {
   FiEye, FiMail, FiZap, FiCheckCircle, FiAlertCircle,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import authService from '@/services/authService';
 
 const SPECIALIZATIONS = ['Full Stack Engineering', 'Frontend Engineering', 'Backend Engineering', 'DevOps / Cloud', 'Machine Learning', 'System Design', 'Mobile Development'];
@@ -78,16 +81,42 @@ export const EditProfilePage = () => {
   const dispatch = useDispatch();
   const authUser = useSelector(selectUser);
 
-  const [form, setForm] = useState({
-    name:          authUser?.name  || '',
-    displayName:   authUser?.email?.split('@')[0] ? `@${authUser.email.split('@')[0]}` : '',
-    bio:           'Architecting elegant solutions at the intersection of design and data. Senior Engineer based in the foggy peaks of the Pacific Northwest.',
-    location:      'India',
-    website:       '',
-    specialization:'Full Stack Engineering',
-    primaryLang:   'TypeScript',
-    yearsExp:      '2',
-    github:        '',
+  const formik = useFormik({
+    initialValues: {
+      name:          authUser?.name  || '',
+      displayName:   authUser?.email?.split('@')[0] ? `@${authUser.email.split('@')[0]}` : '',
+      bio:           authUser?.bio || 'Architecting elegant solutions at the intersection of design and data. Senior Engineer based in the foggy peaks of the Pacific Northwest.',
+      location:      authUser?.location || 'India',
+      website:       authUser?.website || '',
+      specialization:authUser?.specialization || 'Full Stack Engineering',
+      primaryLang:   authUser?.primaryLang || 'TypeScript',
+      yearsExp:      authUser?.yearsExp || '2',
+      github:        authUser?.github || '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required('Name is required'),
+      displayName: Yup.string(),
+      bio: Yup.string().max(250, 'Bio must be less than 250 characters'),
+      location: Yup.string(),
+      website: Yup.string().url('Must be a valid URL'),
+      github: Yup.string(),
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        // 1. Save to backend
+        const updatedUser = await authService.updateProfile(values);
+        
+        // 2. Update Redux
+        dispatch(updateUser(updatedUser));
+        
+        toast.success('Profile settings saved!');
+        navigate('/profile');
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update profile');
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
 
   const [prefs, setPrefs] = useState({
@@ -97,28 +126,12 @@ export const EditProfilePage = () => {
   });
 
   const profileStrength = (() => {
-    const fields = [form.name, form.displayName, form.bio, form.location, form.website, form.github];
+    const fields = [formik.values.name, formik.values.displayName, formik.values.bio, formik.values.location, formik.values.website, formik.values.github];
     const filled = fields.filter(Boolean).length;
     return Math.round((filled / fields.length) * 100);
   })();
 
-  const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
   const togglePref = (key) => () => setPrefs(p => ({ ...p, [key]: !p[key] }));
-
-  const handleSave = async () => {
-    try {
-      // 1. Save to backend
-      const updatedUser = await authService.updateProfile(form);
-      
-      // 2. Update Redux
-      dispatch(updateUser(updatedUser));
-      
-      toast.success('Profile settings saved!');
-      navigate('/profile');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update profile');
-    }
-  };
 
   const handleDiscard = () => {
     toast('Changes discarded.', { icon: '↩️' });
@@ -127,6 +140,10 @@ export const EditProfilePage = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+      <Helmet>
+        <title>Edit Profile | CodeShastra</title>
+        <meta name="description" content="Edit your CodeShastra public profile." />
+      </Helmet>
 
       {/* Header */}
       <button onClick={() => navigate('/profile')} className="flex items-center text-sm font-semibold text-gray-500 hover:text-primary mb-6 transition-colors">
@@ -135,7 +152,7 @@ export const EditProfilePage = () => {
       <h1 className="text-4xl font-extrabold text-gray-900 mb-1">Edit Profile</h1>
       <p className="text-gray-500 mb-8">Manage your public identity and professional credentials in the Atelier.</p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={formik.handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* ── Left: Form ──────────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-8">
@@ -151,7 +168,7 @@ export const EditProfilePage = () => {
             <div className="flex items-center gap-4 mb-6">
               <div className="relative flex-shrink-0">
                 <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl font-extrabold text-white">
-                  {form.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'CS'}
+                  {formik.values.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'CS'}
                 </div>
                 <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center">
                   <FiCamera size={11} className="text-gray-500" />
@@ -172,29 +189,31 @@ export const EditProfilePage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <Field label="Full Name">
-                <Input value={form.name} onChange={set('name')} placeholder="Your full name" />
+                <Input {...formik.getFieldProps('name')} placeholder="Your full name" />
+                {formik.touched.name && formik.errors.name && <p className="text-xs text-red-500 mt-1">{formik.errors.name}</p>}
               </Field>
               <Field label="Display Name">
-                <Input value={form.displayName} onChange={set('displayName')} placeholder="@handle" />
+                <Input {...formik.getFieldProps('displayName')} placeholder="@handle" />
               </Field>
             </div>
 
             <Field label="Bio">
               <textarea
-                value={form.bio}
-                onChange={set('bio')}
+                {...formik.getFieldProps('bio')}
                 rows={3}
                 placeholder="Tell the Atelier who you are..."
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-colors resize-none placeholder:text-gray-400"
+                className={`w-full border rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-1 transition-colors resize-none placeholder:text-gray-400 ${formik.touched.bio && formik.errors.bio ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-indigo-400 focus:ring-indigo-100'}`}
               />
+              {formik.touched.bio && formik.errors.bio && <p className="text-xs text-red-500 mt-1">{formik.errors.bio}</p>}
             </Field>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
               <Field label="Location">
-                <Input icon={FiMapPin} value={form.location} onChange={set('location')} placeholder="City, Country" />
+                <Input icon={FiMapPin} {...formik.getFieldProps('location')} placeholder="City, Country" />
               </Field>
               <Field label="Website">
-                <Input icon={FiGlobe} value={form.website} onChange={set('website')} placeholder="https://yoursite.dev" />
+                <Input icon={FiGlobe} {...formik.getFieldProps('website')} placeholder="https://yoursite.dev" />
+                {formik.touched.website && formik.errors.website && <p className="text-xs text-red-500 mt-1">{formik.errors.website}</p>}
               </Field>
             </div>
           </section>
@@ -208,20 +227,20 @@ export const EditProfilePage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <Field label="Specialization">
-                <select value={form.specialization} onChange={set('specialization')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-indigo-400 transition-colors appearance-none bg-white cursor-pointer">
-                  {SPECIALIZATIONS.map(s => <option key={s}>{s}</option>)}
+                <select {...formik.getFieldProps('specialization')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-indigo-400 transition-colors appearance-none bg-white cursor-pointer">
+                  {SPECIALIZATIONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </Field>
               <Field label="Primary Language">
-                <select value={form.primaryLang} onChange={set('primaryLang')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-indigo-400 transition-colors appearance-none bg-white cursor-pointer">
-                  {LANGUAGES.map(l => <option key={l}>{l}</option>)}
+                <select {...formik.getFieldProps('primaryLang')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-indigo-400 transition-colors appearance-none bg-white cursor-pointer">
+                  {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </Field>
               <Field label="Years of Experience">
-                <Input type="number" min="0" max="40" value={form.yearsExp} onChange={set('yearsExp')} placeholder="e.g. 3" />
+                <Input type="number" min="0" max="40" {...formik.getFieldProps('yearsExp')} placeholder="e.g. 3" />
               </Field>
               <Field label="Github Username">
-                <Input icon={FiGithub} value={form.github} onChange={set('github')} placeholder="github.com/username" />
+                <Input icon={FiGithub} {...formik.getFieldProps('github')} placeholder="github.com/username" />
               </Field>
             </div>
           </section>
@@ -255,11 +274,11 @@ export const EditProfilePage = () => {
 
           {/* Footer Actions */}
           <div className="flex items-center justify-between pt-2 pb-8">
-            <button onClick={handleDiscard} className="text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors">
+            <button type="button" onClick={handleDiscard} className="text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors">
               Discard changes
             </button>
-            <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl transition-colors shadow-md">
-              Save Profile Settings
+            <button type="submit" disabled={formik.isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 text-white font-bold px-8 py-3 rounded-xl transition-colors shadow-md">
+              {formik.isSubmitting ? 'Saving...' : 'Save Profile Settings'}
             </button>
           </div>
         </div>
@@ -269,7 +288,7 @@ export const EditProfilePage = () => {
           {/* Live Preview */}
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Live Preview</p>
-            <PreviewCard name={form.name} displayName={form.displayName} bio={form.bio} location={form.location} />
+            <PreviewCard name={formik.values.name} displayName={formik.values.displayName} bio={formik.values.bio} location={formik.values.location} />
           </div>
 
           {/* Profile Strength */}
@@ -299,12 +318,12 @@ export const EditProfilePage = () => {
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Profile Checklist</p>
             <div className="space-y-2">
               {[
-                { label: 'Add your name',        done: !!form.name         },
-                { label: 'Write a bio',           done: !!form.bio          },
-                { label: 'Set your location',     done: !!form.location     },
-                { label: 'Add website URL',       done: !!form.website      },
-                { label: 'Connect Github',        done: !!form.github       },
-                { label: 'Choose specialization', done: !!form.specialization },
+                { label: 'Add your name',        done: !!formik.values.name         },
+                { label: 'Write a bio',           done: !!formik.values.bio          },
+                { label: 'Set your location',     done: !!formik.values.location     },
+                { label: 'Add website URL',       done: !!formik.values.website      },
+                { label: 'Connect Github',        done: !!formik.values.github       },
+                { label: 'Choose specialization', done: !!formik.values.specialization },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
                   {item.done
@@ -325,7 +344,7 @@ export const EditProfilePage = () => {
             </p>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

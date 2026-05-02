@@ -4,6 +4,8 @@ import { FiFilter, FiStar, FiPlay, FiBookOpen, FiCheckCircle, FiMessageSquare } 
 import { FaNodeJs, FaReact, FaPython, FaRust, FaCloud } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Button from '@/components/ui/Button';
+import Skeleton from '@/components/ui/Skeleton';
+import { Helmet } from 'react-helmet-async';
 
 // Mock data based on Figma design
 const PROJECT_TABS = ['All Tech', 'Node.js', 'React', 'Python', 'Rust'];
@@ -58,8 +60,21 @@ export const ProjectsPage = () => {
     }
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    // Simulate API fetch delay
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+      <Helmet>
+        <title>Engineering Projects | CodeShastra</title>
+        <meta name="description" content="Build real-world engineering projects with peer-review and industry specs." />
+      </Helmet>
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
         <div className="max-w-2xl">
@@ -136,70 +151,99 @@ export const ProjectsPage = () => {
 
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {filteredProjects.map((project) => (
-          <div 
-            key={project.id} 
-            className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative flex flex-col h-full ${
-              project.isNew ? 'border-l-4 border-l-primary' : ''
-            }`}
-          >
-            {/* Badges & Avatars */}
-            <div className="flex justify-between items-start mb-4">
-              <span className={`text-[10px] font-bold px-2 py-1 rounded tracking-wider ${getDifficultyColor(project.difficulty)}`}>
-                {project.difficulty}
-              </span>
-              
-              {project.isNew ? (
-                <FiStar className="text-primary fill-primary w-5 h-5" />
-              ) : project.avatars ? (
+        {isLoading ? (
+          // Skeleton Loaders
+          Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col h-[280px]">
+              <div className="flex justify-between items-start mb-4">
+                <Skeleton className="w-16 h-6 rounded" />
                 <div className="flex -space-x-2">
-                  {project.avatars.map((url, idx) => (
-                    <img key={idx} src={url} alt="Avatar" className="w-6 h-6 rounded-full border-2 border-white" />
-                  ))}
-                  {project.avatarExtra && (
-                    <div className="w-6 h-6 rounded-full border-2 border-white bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
-                      {project.avatarExtra}
-                    </div>
-                  )}
+                   <Skeleton variant="circular" className="w-6 h-6" />
+                   <Skeleton variant="circular" className="w-6 h-6" />
                 </div>
-              ) : null}
-            </div>
-
-            {/* Title & Description */}
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{project.title}</h3>
-            <p className="text-sm text-gray-500 line-clamp-2 mb-6 flex-grow">{project.description}</p>
-
-            {/* Progress */}
-            <div className="mb-6">
-              <div className="flex justify-between text-xs font-semibold mb-2">
-                <span className="text-gray-500">Progress</span>
-                <span className={project.progress === 100 ? 'text-green-600' : 'text-primary'}>{project.progress}%</span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-1.5">
-                <div 
-                  className={`h-1.5 rounded-full ${project.progress === 100 ? 'bg-green-500' : 'bg-primary'}`} 
-                  style={{ width: `${project.progress}%` }}
-                ></div>
+              <Skeleton className="w-3/4 h-6 mb-2" />
+              <Skeleton className="w-full h-4 mb-2" />
+              <Skeleton className="w-5/6 h-4 mb-6 flex-grow" />
+              <div className="mb-6">
+                <div className="flex justify-between mb-2">
+                  <Skeleton className="w-12 h-3" />
+                  <Skeleton className="w-8 h-3" />
+                </div>
+                <Skeleton className="w-full h-1.5" />
+              </div>
+              <div className="flex justify-between items-center mt-auto">
+                <Skeleton className="w-20 h-5" />
+                <Skeleton className="w-24 h-8" />
               </div>
             </div>
-
-            {/* Footer Action */}
-            <div className="flex justify-between items-center mt-auto">
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-600">
-                {project.techIcon}
-                {project.tech}
+          ))
+        ) : (
+          filteredProjects.map((project) => (
+            <div 
+              key={project.id} 
+              className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative flex flex-col h-full ${
+                project.isNew ? 'border-l-4 border-l-primary' : ''
+              }`}
+            >
+              {/* Badges & Avatars */}
+              <div className="flex justify-between items-start mb-4">
+                <span className={`text-[10px] font-bold px-2 py-1 rounded tracking-wider ${getDifficultyColor(project.difficulty)}`}>
+                  {project.difficulty}
+                </span>
+                
+                {project.isNew ? (
+                  <FiStar className="text-primary fill-primary w-5 h-5" />
+                ) : project.avatars ? (
+                  <div className="flex -space-x-2">
+                    {project.avatars.map((url, idx) => (
+                      <img key={idx} src={url} alt="Avatar" className="w-6 h-6 rounded-full border-2 border-white" />
+                    ))}
+                    {project.avatarExtra && (
+                      <div className="w-6 h-6 rounded-full border-2 border-white bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
+                        {project.avatarExtra}
+                      </div>
+                    )}
+                  </div>
+                ) : null}
               </div>
-              <Button 
-                variant={project.actionVariant} 
-                size="sm" 
-                onClick={() => handleActionClick(project.id)}
-                className={project.actionVariant === 'outline' ? 'bg-blue-50/50 border-blue-100 text-primary hover:bg-blue-50' : ''}
-              >
-                {project.actionText}
-              </Button>
+
+              {/* Title & Description */}
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{project.title}</h3>
+              <p className="text-sm text-gray-500 line-clamp-2 mb-6 flex-grow">{project.description}</p>
+
+              {/* Progress */}
+              <div className="mb-6">
+                <div className="flex justify-between text-xs font-semibold mb-2">
+                  <span className="text-gray-500">Progress</span>
+                  <span className={project.progress === 100 ? 'text-green-600' : 'text-primary'}>{project.progress}%</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <div 
+                    className={`h-1.5 rounded-full ${project.progress === 100 ? 'bg-green-500' : 'bg-primary'}`} 
+                    style={{ width: `${project.progress}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Footer Action */}
+              <div className="flex justify-between items-center mt-auto">
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-600">
+                  {project.techIcon}
+                  {project.tech}
+                </div>
+                <Button 
+                  variant={project.actionVariant} 
+                  size="sm" 
+                  onClick={() => handleActionClick(project.id)}
+                  className={project.actionVariant === 'outline' ? 'bg-blue-50/50 border-blue-100 text-primary hover:bg-blue-50' : ''}
+                >
+                  {project.actionText}
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
 
         {/* Special Banner Card */}
         <div className="bg-gradient-to-br from-[#2D1B69] to-[#1A0B40] rounded-2xl p-6 shadow-md relative overflow-hidden flex flex-col justify-between text-white">
