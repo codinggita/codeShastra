@@ -105,7 +105,20 @@ export const EditProfilePage = () => {
   const togglePref = (key) => () => setPrefs(p => ({ ...p, [key]: !p[key] }));
 
   const handleSave = () => {
+    // 1. Update Redux + cs_auth_user in localStorage
     dispatch(updateUser({ name: form.name }));
+
+    // 2. Also update cs_mock_users so name persists after re-login
+    try {
+      const users = JSON.parse(localStorage.getItem('cs_mock_users') || '[]');
+      const updated = users.map(u =>
+        u.email === authUser?.email ? { ...u, name: form.name } : u
+      );
+      localStorage.setItem('cs_mock_users', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Could not update mock users:', e);
+    }
+
     toast.success('Profile settings saved!');
     navigate('/profile');
   };
