@@ -8,6 +8,7 @@ import {
   FiLogOut, FiLock, FiMail, FiGlobe, FiSliders,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import authService from '@/services/authService';
 
 // ── Toggle ─────────────────────────────────────────────────────
 const Toggle = ({ enabled, onToggle }) => (
@@ -112,12 +113,18 @@ export const SettingsPage = () => {
   const toggleNotif  = key => () => setNotifications(n => ({ ...n, [key]: !n[key] }));
   const togglePrivacy = key => () => setPrivacy(p => ({ ...p, [key]: !p[key] }));
 
-  const handlePasswordSave = () => {
+  const handlePasswordSave = async () => {
     if (!currentPassword) return toast.error('Enter your current password.');
     if (newPassword.length < 8) return toast.error('New password must be at least 8 characters.');
     if (newPassword !== confirmPassword) return toast.error('Passwords do not match.');
-    setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
-    toast.success('Password updated successfully!');
+    
+    try {
+      await authService.changePassword({ currentPassword, newPassword });
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+      toast.success('Password updated successfully!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update password');
+    }
   };
 
   const scrollTo = (id) => {

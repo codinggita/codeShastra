@@ -2,32 +2,36 @@ import api from './api';
 
 /**
  * Authentication Service
- * Manages all API calls related to user authentication and profile.
+ * Uses the API instance to communicate with the real backend.
  */
 export const authService = {
-  /**
-   * Register a new user
-   * @param {Object} userData - { name, email, password }
-   */
   register: async (userData) => {
     const response = await api.post('/auth/register', userData);
-    return response.data;
+    return response.data; // Expects { _id, name, email, token }
   },
 
-  /**
-   * Log in an existing user
-   * @param {Object} credentials - { email, password }
-   */
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
+    return response.data; // Expects { _id, name, email, token }
+  },
+
+  getProfile: async () => {
+    const response = await api.get('/auth/me');
     return response.data;
   },
 
-  /**
-   * Fetch the current authenticated user's profile
-   */
-  getProfile: async () => {
-    const response = await api.get('/auth/me');
+  updateProfile: async (profileData) => {
+    const response = await api.put('/users/profile', profileData);
+    return response.data;
+  },
+
+  changePassword: async (passwordData) => {
+    const response = await api.put('/auth/change-password', passwordData);
+    return response.data;
+  },
+
+  deleteAccount: async () => {
+    const response = await api.delete('/users/account');
     return response.data;
   },
 };

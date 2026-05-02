@@ -34,9 +34,8 @@ export const SignupPage = () => {
       try {
         const response = await authService.register(values);
         
-        // Ensure response structure is handled properly. Adjust depending on actual API structure.
         const token = response.token;
-        const user = response.user;
+        const user = { id: response._id, name: response.name, email: response.email, role: 'student' };
         
         dispatch(loginSuccess({ user, token }));
         toast.success('Account created successfully!');

@@ -1,41 +1,45 @@
 import axios from 'axios';
-import { getToken, clearAuthData } from '@/utils/storage';
-import { ROUTES, API_BASE_URL } from '@/utils/constants';
 
-/**
- * Core Axios Instance
- * Pre-configured with base URL, timeouts, and interceptors for auth & error handling.
- */
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request Interceptor: Attach token automatically
+// Request interceptor to add the JWT token to headers
 api.interceptors.request.use(
   (config) => {
-    const token = getToken();
+    const token = localStorage.getItem('cs_auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Response Interceptor: Handle global errors (e.g., 401 Unauthorized)
+// Response interceptor to handle token expiration / generic errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If the server returns 401, the token is invalid or expired
     if (error.response && error.response.status === 401) {
-      clearAuthData();
-      // Force redirect to login if not already there
-      if (window.location.pathname !== ROUTES.LOGIN) {
-        window.location.href = ROUTES.LOGIN;
+      // Token might be expired or invalid
+      console.warn('Unauthorized access, redirecting to login...');
+      // Optional: you can trigger a dispatch here to logout the user from Redux
+      // store.dispatch(logout());
+      
+      // Clear token
+      localStorage.removeItem('cs_auth_token');
+      localStorage.removeItem('cs_auth_user');
+      
+      // Redirect to login if not already there
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+         window.location.href = '/login';
       }
     }
     return Promise.reject(error);
