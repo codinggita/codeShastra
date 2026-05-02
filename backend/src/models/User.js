@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       select: false, // Don't return password by default
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
     bio: {
       type: String,
       default: '',
@@ -71,6 +76,21 @@ const userSchema = new mongoose.Schema(
       weeklyDigest: { type: Boolean, default: false },
       experiencePoints: { type: Boolean, default: true },
     },
+    stats: {
+      streak: { type: Number, default: 1 },
+      timeOnCraft: { type: Number, default: 0 },
+      successRate: { type: Number, default: 100 },
+      complexity: { type: String, default: 'O(n)' },
+      competencies: {
+        frontend: { type: Number, default: 80 },
+        backend: { type: Number, default: 60 },
+        optimization: { type: Number, default: 90 },
+      },
+      contributionPulse: {
+        type: [Number],
+        default: [0, 1, 2, 0, 3, 4, 1, 0, 0, 2, 3, 1], // default mock array so it's not empty for new users
+      },
+    },
   },
   {
     timestamps: true,
@@ -78,9 +98,9 @@ const userSchema = new mongoose.Schema(
 );
 
 // Encrypt password using bcrypt before saving
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);
